@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CloudFlareDDNS.Models
+namespace CloudFlareDDNS.Models.Response
 {
     public class IpResponse
     {
