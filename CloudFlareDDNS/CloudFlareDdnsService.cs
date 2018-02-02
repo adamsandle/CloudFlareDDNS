@@ -2,7 +2,7 @@
 using System.IO;
 using System.ServiceProcess;
 using System.Timers;
-using CloudFlareDDNS.Models;
+using CloudFlareDDNS.Models.Response;
 
 namespace CloudFlareDDNS
 {
@@ -23,7 +23,7 @@ namespace CloudFlareDDNS
             _eventTimer.Interval = 10000;
             _eventTimer.Elapsed += EventTimerTick;
             _eventTimer.Enabled = true;
-            Logger.WriteLog("Test windows service started");
+            Logger.WriteLog("CloudFlare DDNS service started");
             string folderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "CloudFlareDDNS");
             Directory.CreateDirectory(folderName);
@@ -36,6 +36,7 @@ namespace CloudFlareDDNS
                 _isUpdating = true;
                 _ipResponse = await Http.GetPublicIp();
                 Logger.WriteLog("Ip updated:" + _ipResponse.Ip);
+                CloudFlareApi.UpdateDns(_ipResponse.Ip);
                 _isUpdating = false;
             }
         }

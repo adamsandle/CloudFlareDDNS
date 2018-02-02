@@ -48,9 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloudFlareApi.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Http.cs" />
-    <Compile Include="Models\IpResponse.cs" />
+    <Compile Include="Models\Response\CloudFlareDnsRecordsResponse.cs" />
+    <Compile Include="Models\Requests\CloudFlareUpdateDnsRecordRequest.cs" />
+    <Compile Include="Models\Response\CloudFlareZonesResponse.cs" />
+    <Compile Include="Models\Response\IpResponse.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -76,5 +80,6 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
