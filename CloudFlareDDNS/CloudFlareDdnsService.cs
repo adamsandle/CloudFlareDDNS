@@ -2,6 +2,7 @@
 using System.IO;
 using System.ServiceProcess;
 using System.Timers;
+using CloudFlareDDNS.Models;
 using CloudFlareDDNS.Models.Response;
 
 namespace CloudFlareDDNS
@@ -9,8 +10,9 @@ namespace CloudFlareDDNS
     public partial class CloudFlareDdnsService : ServiceBase
     {
         private Timer _eventTimer;
-        private IpResponse _ipResponse;
+        public static IpResponse IpResponse;
         private bool _isUpdating;
+        public static UserConfig UserConfig;
         public CloudFlareDdnsService()
         {
             InitializeComponent();
@@ -19,24 +21,36 @@ namespace CloudFlareDDNS
 
         protected override void OnStart(string[] args)
         {
-            _eventTimer = new Timer();
-            _eventTimer.Interval = 10000;
+            Logger.WriteLog("CloudFlare DDNS service started");
+            Directory.CreateDirectory(Config.Folder);
+            UserConfig = Config.GetUserConfig();
+            if (UserConfig == null)
+            {
+                Environment.Exit(0);
+            }
+            _eventTimer = new Timer {Interval = 10000};
             _eventTimer.Elapsed += EventTimerTick;
             _eventTimer.Enabled = true;
-            Logger.WriteLog("CloudFlare DDNS service started");
-            string folderName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "CloudFlareDDNS");
-            Directory.CreateDirectory(folderName);
         }
 
         private async void EventTimerTick(object sender, ElapsedEventArgs e)
         {
-            if ((_ipResponse == null || (DateTime.UtcNow - _ipResponse.Updated).Minutes > 4) && !_isUpdating)
+            if ((IpResponse == null && !_isUpdating || IpResponse != null && (DateTime.UtcNow - IpResponse.Updated).Minutes > 4) && !_isUpdating)
             {
                 _isUpdating = true;
-                _ipResponse = await Http.GetPublicIp();
-                Logger.WriteLog("Ip updated:" + _ipResponse.Ip);
-                CloudFlareApi.UpdateDns(_ipResponse.Ip);
+                var currentIp = await Http.GetPublicIp();
+                var updateDns = false;
+                if (IpResponse?.Ip != currentIp.Ip)
+                {
+                    Logger.WriteLog("Ip updated:" + currentIp);
+                    updateDns = true;
+                }
+                IpResponse = currentIp;
+
+                if (updateDns)
+                {
+                    await CloudFlareApi.UpdateDns();
+                }
                 _isUpdating = false;
             }
         }

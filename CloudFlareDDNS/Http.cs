@@ -16,7 +16,7 @@ namespace CloudFlareDDNS
             return publicIp;
         }
 
-        public static async Task<T> HttpGetRequest<T>(string url)
+        private static async Task<T> HttpGetRequest<T>(string url)
         {
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
@@ -37,8 +37,8 @@ namespace CloudFlareDDNS
             {
                 HttpClient client = new HttpClient();
                 var cloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
-                client.DefaultRequestHeaders.Add("X-Auth-Key", "APIKEY");
-                client.DefaultRequestHeaders.Add("X-Auth-Email", "EMAIL");
+                client.DefaultRequestHeaders.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
+                client.DefaultRequestHeaders.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
                 HttpResponseMessage response = await client.GetAsync(cloudFlareBaseUrl + url);
 
                 if (response.IsSuccessStatusCode)
@@ -55,14 +55,14 @@ namespace CloudFlareDDNS
             return default(T);
         }
 
-        public static async Task<T> CloudFlareHttpPostRequest<T>(string url, T body)
+        public static async Task<T> CloudFlareHttpPutRequest<T>(string url, T body)
         {
             try
             {
                 HttpClient client = new HttpClient();
                 var cloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
-                client.DefaultRequestHeaders.Add("X-Auth-Key", "APIKEY");
-                client.DefaultRequestHeaders.Add("X-Auth-Email", "EMAIL");
+                client.DefaultRequestHeaders.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
+                client.DefaultRequestHeaders.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
                 var json = JsonConvert.SerializeObject(body);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PutAsync(cloudFlareBaseUrl + url, data);

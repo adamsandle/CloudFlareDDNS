@@ -1,8 +1,7 @@
 ﻿namespace CloudFlareDDNS.Models.Response
 {
-    public class CloudFlareZonesResponse
+    public class CloudFlareZonesResponse : CloudFlareBaseResponse
     {
-        public bool Success { get; set; }
         public CloudFlareZoneResultResponse[] Result { get; set; }
     }
 
