@@ -40,9 +40,9 @@ namespace CloudFlareDDNS
                 _isUpdating = true;
                 var currentIp = await Http.GetPublicIp();
                 var updateDns = false;
-                if (IpResponse?.Ip != currentIp.Ip)
+                if (currentIp != null && IpResponse?.Ip != currentIp.Ip)
                 {
-                    Logger.WriteLog("Ip updated:" + currentIp);
+                    Logger.WriteLog("Ip updated:" + currentIp.Ip);
                     updateDns = true;
                 }
                 IpResponse = currentIp;

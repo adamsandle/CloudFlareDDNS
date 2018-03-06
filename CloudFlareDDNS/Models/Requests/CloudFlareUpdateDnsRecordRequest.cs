@@ -1,6 +1,10 @@
 ﻿namespace CloudFlareDDNS.Models.Requests
 {
-    public class CloudFlareUpdateDnsRecordRequest
+    public class BaseRequest
+    {
+        
+    }
+    public class CloudFlareUpdateDnsRecordRequest : BaseRequest
     {
         public string type { get; set; }
         public string name { get; set; }
