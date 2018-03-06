@@ -13,6 +13,9 @@ namespace CloudFlareDDNS
         public static readonly string LogFile = Path.Combine(Folder, "Logfile.txt");
         private static readonly string UserConfigFile = Path.Combine(Folder, "Config.yml");
 
+        public const string CloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
+        public const string IpUrl = "https://api.ipify.org?format=json";
+
         public static UserConfig GetUserConfig()
         {
             try

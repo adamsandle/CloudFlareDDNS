@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using CloudFlareDDNS.Models.Requests;
 using CloudFlareDDNS.Models.Response;
 using Newtonsoft.Json;
 
@@ -11,74 +12,62 @@ namespace CloudFlareDDNS
     {
         public static async Task<IpResponse> GetPublicIp()
         {
-            var publicIp = await HttpGetRequest<IpResponse>("https://api.ipify.org?format=json");
-            publicIp.Updated = DateTime.UtcNow;
-            return publicIp;
+            try
+            {
+                var publicIp = await HttpRequest<IpResponse>(HttpMethod.Get, Config.IpUrl, false, null);
+                if (publicIp != null)
+                {
+                    publicIp.Updated = DateTime.UtcNow;
+                }
+                return publicIp;
+            }
+            catch (Exception e)
+            {
+                Logger.WriteLog(e);
+            }
+            return null;
         }
 
-        private static async Task<T> HttpGetRequest<T>(string url)
+        public static async Task<T> HttpRequest<T>(HttpMethod method, string url, bool cloudFlare, BaseRequest body)
         {
             HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
 
-            if (response.IsSuccessStatusCode)
+            var request = new HttpRequestMessage(method, url);
+            
+            if (cloudFlare)
             {
-                var responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-                return responseObject;
-            }
-            return default(T);
-        }
-
-        public static async Task<T> CloudFlareHttpGetRequest<T>(string url)
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-                var cloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
                 client.DefaultRequestHeaders.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
                 client.DefaultRequestHeaders.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
-                HttpResponseMessage response = await client.GetAsync(cloudFlareBaseUrl + url);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    var responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-                    return responseObject;
-                }
+                client.BaseAddress = new Uri(Config.CloudFlareBaseUrl);
             }
-            catch (Exception e)
-            {
-                Logger.WriteLog(e);
-            }
-            return default(T);
-        }
 
-        public static async Task<T> CloudFlareHttpPutRequest<T>(string url, T body)
-        {
-            try
+            if (body != null)
             {
-                HttpClient client = new HttpClient();
-                var cloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
-                client.DefaultRequestHeaders.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
-                client.DefaultRequestHeaders.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
                 var json = JsonConvert.SerializeObject(body);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PutAsync(cloudFlareBaseUrl + url, data);
+                request.Content = data;
+            }
 
-                if (response.IsSuccessStatusCode)
+            var response = await client.SendAsync(request);
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseObject = JsonConvert.DeserializeObject<T>(responseBody);
+            if (response.IsSuccessStatusCode)
+            {
+                return responseObject;
+            }
+            else if (cloudFlare)
+            {
+                var baseResponse = responseObject as CloudFlareBaseResponse;
+                if (baseResponse != null)
                 {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    var responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-                    return responseObject;
+                    foreach (var error in baseResponse.Errors)
+                    {
+                        Logger.WriteLog("CloudFlare API Error: " + error.Code + " " + error.Message);
+                    }
                 }
             }
-            catch (Exception e)
-            {
-                Logger.WriteLog(e);
-            }
-            return default(T);
+            throw new Exception(response.StatusCode.ToString());
         }
     }
 }
