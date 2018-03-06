@@ -41,6 +41,7 @@ namespace CloudFlareDDNS
                         content = CloudFlareDdnsService.IpResponse.Ip
                     };
                     await Http.HttpRequest<CloudFlareBaseResponse>(HttpMethod.Put, "zones/" + record.Zone_Id + "/dns_records/" + record.Id, true, request);
+                    Logger.WriteLog(recordDetails.Result.Name + " Successfully Updated");
                 }
                 return true;
             }

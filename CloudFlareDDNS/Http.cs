@@ -28,17 +28,15 @@ namespace CloudFlareDDNS
             return null;
         }
 
+        private static HttpClient client = new HttpClient();
         public static async Task<T> HttpRequest<T>(HttpMethod method, string url, bool cloudFlare, BaseRequest body)
         {
-            HttpClient client = new HttpClient();
-
-            var request = new HttpRequestMessage(method, url);
+            var request = new HttpRequestMessage(method, cloudFlare ? Config.CloudFlareBaseUrl + url : url);
             
             if (cloudFlare)
             {
-                client.DefaultRequestHeaders.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
-                client.DefaultRequestHeaders.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
-                client.BaseAddress = new Uri(Config.CloudFlareBaseUrl);
+                request.Headers.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
+                request.Headers.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
             }
 
             if (body != null)
