@@ -54,6 +54,7 @@
     <Compile Include="CloudFlareApi.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Http.cs" />
+    <Compile Include="Models\Requests\BaseRequest.cs" />
     <Compile Include="Models\Response\CloudFlareBaseResponse.cs" />
     <Compile Include="Models\Response\CloudFlareDnsRecordResponse.cs" />
     <Compile Include="Models\UserConfig.cs" />
