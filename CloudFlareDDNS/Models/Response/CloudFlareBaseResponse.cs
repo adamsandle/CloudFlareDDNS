@@ -3,10 +3,11 @@
     public class CloudFlareBaseResponse
     {
         public bool Success { get; set; }
-        public CloudFlareErrorResponse[] Errors { get; set; }
+        public CloudFlareMessageResponse[] Errors { get; set; }
+        public CloudFlareMessageResponse[] Messages { get; set; }
     }
 
-    public class CloudFlareErrorResponse
+    public class CloudFlareMessageResponse
     {
         public int Code { get; set; }
         public string Message { get; set; }
