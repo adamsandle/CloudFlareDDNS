@@ -1,4 +1,4 @@
-﻿namespace CloudFlareDDNS
+﻿namespace CloudFlareDdns.Service
 {
     partial class CloudFlareDdnsService
     {

@@ -1,14 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.ServiceModel;
 using System.ServiceProcess;
 using System.Timers;
-using CloudFlareDDNS.Models;
-using CloudFlareDDNS.Models.Response;
+using CloudFlareDdns.Service.Models;
+using CloudFlareDdns.Service.Models.Response;
+using CloudFlareDdns.SharedLogic.Interfaces;
 
-namespace CloudFlareDDNS
+namespace CloudFlareDdns.Service
 {
     public partial class CloudFlareDdnsService : ServiceBase
     {
+        private static ServiceHost _host;
         private Timer _eventTimer;
         public static IpResponse IpResponse;
         private bool _isUpdating;
@@ -28,6 +31,7 @@ namespace CloudFlareDDNS
             {
                 Environment.Exit(0);
             }
+            SetUpServer();
             _eventTimer = new Timer {Interval = 10000};
             _eventTimer.Elapsed += EventTimerTick;
             _eventTimer.Enabled = true;
@@ -55,10 +59,36 @@ namespace CloudFlareDDNS
             }
         }
 
+        public string GetIp()
+        {
+            return IpResponse.Ip;
+        }
+
         protected override void OnStop()
         {
+            _host?.Close();
             _eventTimer.Enabled = false;
             Logger.WriteLog("Test service stopped");
+        }
+
+        private static void SetUpServer()
+        {
+            _host = new ServiceHost(
+                typeof(CloudFlareDdnsCommsService),
+                new Uri[]
+                {
+                    new Uri("http://localhost:8320"),
+                    new Uri("net.pipe://localhost")
+                });
+            _host.AddServiceEndpoint(typeof(ICloudFlareDdnsCommsService),
+                new BasicHttpBinding(),
+                "Reverse");
+
+            _host.AddServiceEndpoint(typeof(ICloudFlareDdnsCommsService),
+                new NetNamedPipeBinding(),
+                "PipeReverse");
+
+            _host.Open();
         }
     }
 }

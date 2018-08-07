@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using YamlDotNet.Serialization;
+﻿using YamlDotNet.Serialization;
 
-namespace CloudFlareDDNS.Models
+namespace CloudFlareDdns.Service.Models
 {
     public class UserConfig
     {

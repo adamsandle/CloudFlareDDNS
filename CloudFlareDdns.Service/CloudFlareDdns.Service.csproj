@@ -6,11 +6,14 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{12D1C28B-C22A-49DF-8BED-706617ACC8B3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>CloudFlareDDNS</RootNamespace>
-    <AssemblyName>CloudFlareDDNS</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>CloudFlareDdns.Service</RootNamespace>
+    <AssemblyName>CloudFlareDdns.Service</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,6 +42,8 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Channels" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CloudFlareApi.cs" />
+    <Compile Include="CloudFlareDdnsCommsService.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Http.cs" />
     <Compile Include="Models\Requests\BaseRequest.cs" />
@@ -87,6 +93,11 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\CloudFlareDdns.SharedLogic\CloudFlareDdns.SharedLogic.csproj">
+      <Project>{377d784e-8e01-4f5b-b4e1-093e0546f44b}</Project>
+      <Name>CloudFlareDdns.SharedLogic</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
