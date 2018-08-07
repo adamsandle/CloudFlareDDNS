@@ -1,4 +1,4 @@
-﻿namespace CloudFlareDDNS.Models.Requests
+﻿namespace CloudFlareDdns.Service.Models.Requests
 {
     public class CloudFlareUpdateDnsRecordRequest : BaseRequest
     {

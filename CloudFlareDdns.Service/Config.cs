@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using CloudFlareDDNS.Models;
+using CloudFlareDdns.Service.Models;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace CloudFlareDDNS
+namespace CloudFlareDdns.Service
 {
     public static class Config
     {

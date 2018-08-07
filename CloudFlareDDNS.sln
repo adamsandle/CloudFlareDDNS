@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareDDNS", "CloudFlareDDNS\CloudFlareDDNS.csproj", "{12D1C28B-C22A-49DF-8BED-706617ACC8B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareDdns.Service", "CloudFlareDdns.Service\CloudFlareDdns.Service.csproj", "{12D1C28B-C22A-49DF-8BED-706617ACC8B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareDdns.Cli", "CloudFlareDdns.Cli\CloudFlareDdns.Cli.csproj", "{707746BC-8764-4C59-B341-C4C8FABBBCFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFlareDdns.SharedLogic", "CloudFlareDdns.SharedLogic\CloudFlareDdns.SharedLogic.csproj", "{377D784E-8E01-4F5B-B4E1-093E0546F44B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +19,19 @@ Global
 		{12D1C28B-C22A-49DF-8BED-706617ACC8B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12D1C28B-C22A-49DF-8BED-706617ACC8B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12D1C28B-C22A-49DF-8BED-706617ACC8B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{707746BC-8764-4C59-B341-C4C8FABBBCFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{707746BC-8764-4C59-B341-C4C8FABBBCFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{707746BC-8764-4C59-B341-C4C8FABBBCFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{707746BC-8764-4C59-B341-C4C8FABBBCFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{377D784E-8E01-4F5B-B4E1-093E0546F44B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{377D784E-8E01-4F5B-B4E1-093E0546F44B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{377D784E-8E01-4F5B-B4E1-093E0546F44B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{377D784E-8E01-4F5B-B4E1-093E0546F44B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A26D7185-631B-40EA-B718-2786CF90F6A9}
 	EndGlobalSection
 EndGlobal

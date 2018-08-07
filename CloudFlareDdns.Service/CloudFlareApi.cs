@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using CloudFlareDDNS.Models.Requests;
-using CloudFlareDDNS.Models.Response;
+using CloudFlareDdns.Service.Models.Requests;
+using CloudFlareDdns.Service.Models.Response;
 
-namespace CloudFlareDDNS
+namespace CloudFlareDdns.Service
 {
     public static class CloudFlareApi
     {

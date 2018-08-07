@@ -3,11 +3,11 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using CloudFlareDDNS.Models.Requests;
-using CloudFlareDDNS.Models.Response;
+using CloudFlareDdns.Service.Models.Requests;
+using CloudFlareDdns.Service.Models.Response;
 using Newtonsoft.Json;
 
-namespace CloudFlareDDNS
+namespace CloudFlareDdns.Service
 {
     public static class Http
     {

@@ -1,4 +1,4 @@
-﻿namespace CloudFlareDDNS.Models.Response
+﻿namespace CloudFlareDdns.Service.Models.Response
 {
     public class CloudFlareZonesResponse : CloudFlareBaseResponse
     {
