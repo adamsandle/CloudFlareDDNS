@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using CloudFlareDdns.Service.Models;
+using CloudFlareDdns.Service.Utils;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 

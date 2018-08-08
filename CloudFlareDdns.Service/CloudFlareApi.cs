@@ -5,13 +5,18 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CloudFlareDdns.Service.Models.Requests;
 using CloudFlareDdns.Service.Models.Response;
+using CloudFlareDdns.Service.Utils;
+using CloudFlareDdns.SharedLogic.Models;
 
 namespace CloudFlareDdns.Service
 {
     public static class CloudFlareApi
     {
-        public static async Task<bool> UpdateDns()
+        public static async Task<UpdateResponse> UpdateDns(IEnumerable<string> hosts)
         {
+            List<string> hostsToUpdate = hosts.Any() ? hosts.ToList() : Config.GetUserConfig().HostsToUpdate.Select(c => c.Hostname).ToList();
+            List<string> hostsUpdated = new List<string>();
+
             try
             {
                 var zones = await Http.HttpRequest<CloudFlareZonesResponse>(HttpMethod.Get, "zones", true, null);
@@ -27,7 +32,7 @@ namespace CloudFlareDdns.Service
                     }
                 }
 
-                var recordNamesToUpdate = records.Select(r => r.Name).Intersect(CloudFlareDdnsService.UserConfig.HostsToUpdate.Select(r => r.Hostname));
+                var recordNamesToUpdate = records.Select(r => r.Name).Intersect(hostsToUpdate);
                 var recordsToUpdate = records.Where(r => recordNamesToUpdate.Contains(r.Name));
                 foreach (var record in recordsToUpdate)
                 {
@@ -42,13 +47,26 @@ namespace CloudFlareDdns.Service
                     };
                     await Http.HttpRequest<CloudFlareBaseResponse>(HttpMethod.Put, "zones/" + record.Zone_Id + "/dns_records/" + record.Id, true, request);
                     Logger.WriteLog(recordDetails.Result.Name + " Successfully Updated");
+
+                    hostsToUpdate.Remove(recordDetails.Result.Name);
+                    hostsUpdated.Add(recordDetails.Result.Name);
                 }
-                return true;
+                return new UpdateResponse
+                {
+                    HostsNotUpdated = hostsToUpdate.ToArray(),
+                    HostsUpdated = hostsUpdated.ToArray(),
+                    Success = hostsToUpdate.Count == 0
+                };
             }
             catch (Exception e)
             {
                 Logger.WriteLog(e);
-                return false;
+                return new UpdateResponse
+                {
+                    HostsNotUpdated = hostsToUpdate.ToArray(),
+                    HostsUpdated = hostsUpdated.ToArray(),
+                    Success = false
+                };
             }
         }
     }
