@@ -12,9 +12,9 @@ namespace CloudFlareDdns.Service
 {
     public static class CloudFlareApi
     {
-        public static async Task<UpdateResponse> UpdateDns(IEnumerable<string> hosts)
+        public static async Task<UpdateResponse> UpdateDns(string[] hosts)
         {
-            List<string> hostsToUpdate = hosts.Any() ? hosts.ToList() : Config.GetUserConfig().HostsToUpdate.Select(c => c.Hostname).ToList();
+            List<string> hostsToUpdate = hosts.ToList();
             List<string> hostsUpdated = new List<string>();
 
             try
