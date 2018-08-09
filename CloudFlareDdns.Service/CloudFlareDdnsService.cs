@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.ServiceModel;
 using System.ServiceProcess;
 using System.Threading.Tasks;
@@ -46,7 +44,7 @@ namespace CloudFlareDdns.Service
         {
             if ((IpResponse == null && !_isUpdating || IpResponse != null && (DateTime.UtcNow - IpResponse.Updated).Minutes > 4) && !_isUpdating)
             {
-                await UpdateDns(new string[]{});
+                await UpdateDns(UserConfig.Hosts);
             }
         }
 
@@ -76,9 +74,9 @@ namespace CloudFlareDdns.Service
             return IpResponse.Ip;
         }
 
-        public async Task<UpdateResponse> ForceUpdate(IEnumerable<string> hosts)
+        public async Task<UpdateResponse> ForceUpdate(string[] hosts)
         {
-            var result = await UpdateDns(hosts.ToArray(), true);
+            var result = await UpdateDns(hosts.Length > 0 ? hosts : UserConfig.Hosts, true);
             return result;
         }
 

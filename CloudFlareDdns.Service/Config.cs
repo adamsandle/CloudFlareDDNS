@@ -1,9 +1,8 @@
 using System;
 using System.IO;
+using System.Xml.Serialization;
 using CloudFlareDdns.Service.Models;
 using CloudFlareDdns.Service.Utils;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace CloudFlareDdns.Service
 {
@@ -12,10 +11,12 @@ namespace CloudFlareDdns.Service
         public static readonly string Folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudFlareDDNS");
 
         public static readonly string LogFile = Path.Combine(Folder, "Logfile.txt");
-        private static readonly string UserConfigFile = Path.Combine(Folder, "Config.yml");
+        private static readonly string UserConfigFile = Path.Combine(Folder, "config.xml");
 
         public const string CloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
         public const string IpUrl = "https://api.ipify.org?format=json";
+
+        private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(UserConfig));
 
         public static UserConfig GetUserConfig()
         {
@@ -23,18 +24,14 @@ namespace CloudFlareDdns.Service
             {
                 if (File.Exists(UserConfigFile))
                 {
-                    string input = File.ReadAllText(UserConfigFile);
-
-                    var deserializer = new DeserializerBuilder()
-                        .WithNamingConvention(new CamelCaseNamingConvention())
-                        .Build();
-
-                    var userConfig = deserializer.Deserialize<UserConfig>(input);
-                    return userConfig;
+                    using (FileStream fileStream = new FileStream(UserConfigFile, FileMode.Open))
+                    {
+                        return (UserConfig) Serializer.Deserialize(fileStream);
+                    }
                 }
-                File.WriteAllText(UserConfigFile, UserConfigFileTemplate);
-                Logger.WriteLog("Sample config saved");
-                return null;
+                var config = new UserConfig();
+                SetUserConfig(config);
+                return config;
             }
             catch (Exception e)
             {
@@ -43,11 +40,18 @@ namespace CloudFlareDdns.Service
             }
         }
 
-        private static readonly string UserConfigFileTemplate = @"---
-email:		test@mail.com
-api_key:	123-456-789-0
-hosts_to_update:
-    - hostname:   test.domain.com
-    - hostname:   mail.domain.com";
+        public static void SetUserConfig(UserConfig config)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(UserConfig));
+                TextWriter tw = new StreamWriter(UserConfigFile);
+                xs.Serialize(tw, config);
+            }
+            catch (Exception e)
+            {
+                Logger.WriteLog(e);
+            }
+        }
     }
 }
