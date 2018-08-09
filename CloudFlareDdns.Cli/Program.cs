@@ -1,6 +1,5 @@
-﻿using System;
-using System.ServiceModel;
-using CloudFlareDdns.SharedLogic.Interfaces;
+﻿using System.Threading.Tasks;
+using CommandLine;
 
 namespace CloudFlareDdns.Cli
 {
@@ -8,34 +7,11 @@ namespace CloudFlareDdns.Cli
     {
         static void Main(string[] args)
         {
-            ChannelFactory<ICloudFlareDdnsCommsService> httpFactory =
-                new ChannelFactory<ICloudFlareDdnsCommsService>(
-                    new BasicHttpBinding(),
-                    new EndpointAddress(
-                        "http://localhost:8320/Reverse"));
-
-            ChannelFactory<ICloudFlareDdnsCommsService> pipeFactory =
-                new ChannelFactory<ICloudFlareDdnsCommsService>(
-                    new NetNamedPipeBinding(),
-                    new EndpointAddress(
-                        "net.pipe://localhost/PipeReverse"));
-
-            ICloudFlareDdnsCommsService httpProxy =
-                httpFactory.CreateChannel();
-
-            ICloudFlareDdnsCommsService pipeProxy =
-                pipeFactory.CreateChannel();
-
-            while (true)
-            {
-                string str = System.Console.ReadLine();
-                Console.WriteLine("pipe: " +
-                                  pipeProxy.GetIp());
-//                WriteLine("http: " +
-//                                  httpProxy.ReverseString(str));
-//                WriteLine("pipe: " +
-//                                  pipeProxy.ReverseString(str));
-            }
+            Parser.Default.ParseArguments<GetIpOptions, UpdateOptions>(args)
+                .MapResult(
+                    (GetIpOptions opts) => new Proxy(opts).GetIp(), 
+                    (UpdateOptions opts) => new Proxy(opts).Update(),
+                    errs => 1);
         }
     }
 }

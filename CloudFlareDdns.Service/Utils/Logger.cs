@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace CloudFlareDdns.Service
+namespace CloudFlareDdns.Service.Utils
 {
     public static class Logger
     {

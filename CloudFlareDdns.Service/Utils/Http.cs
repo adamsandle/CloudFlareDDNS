@@ -7,7 +7,7 @@ using CloudFlareDdns.Service.Models.Requests;
 using CloudFlareDdns.Service.Models.Response;
 using Newtonsoft.Json;
 
-namespace CloudFlareDdns.Service
+namespace CloudFlareDdns.Service.Utils
 {
     public static class Http
     {

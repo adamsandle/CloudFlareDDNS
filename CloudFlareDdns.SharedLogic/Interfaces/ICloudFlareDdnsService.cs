@@ -1,4 +1,7 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
+using System.Threading.Tasks;
+using CloudFlareDdns.SharedLogic.Models;
 
 namespace CloudFlareDdns.SharedLogic.Interfaces
 {
@@ -7,5 +10,8 @@ namespace CloudFlareDdns.SharedLogic.Interfaces
     {
         [OperationContract]
         string GetIp();
+
+        [OperationContract]
+        UpdateResponse ForceUpdate(string[] hosts);
     }
 }

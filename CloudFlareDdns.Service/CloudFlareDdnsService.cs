@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.ServiceModel;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using System.Timers;
 using CloudFlareDdns.Service.Models;
 using CloudFlareDdns.Service.Models.Response;
+using CloudFlareDdns.Service.Utils;
 using CloudFlareDdns.SharedLogic.Interfaces;
+using CloudFlareDdns.SharedLogic.Models;
 
 namespace CloudFlareDdns.Service
 {
@@ -41,27 +46,40 @@ namespace CloudFlareDdns.Service
         {
             if ((IpResponse == null && !_isUpdating || IpResponse != null && (DateTime.UtcNow - IpResponse.Updated).Minutes > 4) && !_isUpdating)
             {
-                _isUpdating = true;
-                var currentIp = await Http.GetPublicIp();
-                var updateDns = false;
-                if (currentIp != null && IpResponse?.Ip != currentIp.Ip)
-                {
-                    Logger.WriteLog("Ip updated:" + currentIp.Ip);
-                    updateDns = true;
-                }
-                IpResponse = currentIp;
-
-                if (updateDns)
-                {
-                    await CloudFlareApi.UpdateDns();
-                }
-                _isUpdating = false;
+                await UpdateDns(new string[]{});
             }
+        }
+
+        private async Task<UpdateResponse> UpdateDns(string[] hosts, bool forceUpdate = false)
+        {
+            _isUpdating = true;
+            var currentIp = await Http.GetPublicIp();
+            var updateDns = false;
+            if (currentIp != null && IpResponse?.Ip != currentIp.Ip)
+            {
+                Logger.WriteLog("Ip updated:" + currentIp.Ip);
+                updateDns = true;
+            }
+            IpResponse = currentIp;
+
+            UpdateResponse result = null;
+            if (updateDns || forceUpdate)
+            {
+                result = await CloudFlareApi.UpdateDns(hosts);
+            }
+            _isUpdating = false;
+            return result;
         }
 
         public string GetIp()
         {
             return IpResponse.Ip;
+        }
+
+        public async Task<UpdateResponse> ForceUpdate(IEnumerable<string> hosts)
+        {
+            var result = await UpdateDns(hosts.ToArray(), true);
+            return result;
         }
 
         protected override void OnStop()
