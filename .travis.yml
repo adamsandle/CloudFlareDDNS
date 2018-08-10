@@ -5,4 +5,5 @@ install:
   - sudo apt-get install nunit-console
   - nuget restore CloudFlareDDNS.sln
 script:
+  - msbuild /p:Configuration=Release CloudFlareDDNS.sln
   - nunit-console CloudFlareDdns.Tests/bin/Release/CloudFlareDdns.Tests.dll
