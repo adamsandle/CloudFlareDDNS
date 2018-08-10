@@ -4,5 +4,5 @@ install:
   - sudo apt-get install -y gtk-sharp2
   - sudo apt-get install nunit-console
   - nuget restore CloudFlareDDNS.sln
-after_script:
+script:
   - nunit-console CloudFlareDdns.Tests/bin/Release/CloudFlareDdns.Tests.dll
