@@ -44,9 +44,9 @@ namespace CloudFlareDdns.Tests
         }
 
         [Test]
-        public static void TestShouldFail()
+        public static void TestShouldPass()
         {
-            Assert.True(false);
+            Assert.True(true);
         }
 
     }
