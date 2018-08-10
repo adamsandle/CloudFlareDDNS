@@ -3,9 +3,9 @@ using CommandLine;
 
 namespace CloudFlareDdns.Cli
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Parser.Default.ParseArguments<GetIpOptions, UpdateOptions>(args)
                 .MapResult(
