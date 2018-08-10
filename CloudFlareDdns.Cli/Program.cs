@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using CloudFlareDdns.Cli.Services;
+using CloudFlareDdns.SharedLogic.Interfaces;
 using CommandLine;
 
 namespace CloudFlareDdns.Cli
@@ -9,8 +10,8 @@ namespace CloudFlareDdns.Cli
         {
             Parser.Default.ParseArguments<GetIpOptions, UpdateOptions>(args)
                 .MapResult(
-                    (GetIpOptions opts) => new Proxy(opts).GetIp(), 
-                    (UpdateOptions opts) => new Proxy(opts).Update(),
+                    (GetIpOptions opts) => Actions.GetIp(opts, new ChannelFactoryService().CreateChannelFactory<ICloudFlareDdnsCommsService>(opts)),
+                    (UpdateOptions opts) => Actions.Update(opts, new ChannelFactoryService().CreateChannelFactory<ICloudFlareDdnsCommsService>(opts)),
                     errs => 1);
         }
     }
