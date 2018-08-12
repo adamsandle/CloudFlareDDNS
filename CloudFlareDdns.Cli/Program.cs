@@ -6,13 +6,29 @@ namespace CloudFlareDdns.Cli
 {
     class Program
     {
+        private static NetworkActions _networkActions;
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<GetIpOptions, UpdateOptions>(args)
                 .MapResult(
-                    (GetIpOptions opts) => Actions.GetIp(opts, new ChannelFactoryService().CreateChannelFactory<ICloudFlareDdnsCommsService>(opts)),
-                    (UpdateOptions opts) => Actions.Update(opts, new ChannelFactoryService().CreateChannelFactory<ICloudFlareDdnsCommsService>(opts)),
+                    (GetIpOptions opts) =>
+                    {
+                        Setup(opts);
+                        return _networkActions.GetIp(opts);
+                    },
+                    (UpdateOptions opts) =>
+                    {
+                        Setup(opts);
+                        return _networkActions.Update(opts);
+                    },
                     errs => 1);
+        }
+
+        static void Setup(NetworkOptions opts)
+        {
+            var commsService = new ChannelFactoryService().CreateChannelFactory<ICloudFlareDdnsCommsService>(opts);
+            var loggerService = new ConsoleOutputService();
+            _networkActions = new NetworkActions(commsService, loggerService);
         }
     }
 }

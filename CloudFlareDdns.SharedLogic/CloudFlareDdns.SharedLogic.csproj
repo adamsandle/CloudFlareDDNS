@@ -44,7 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\ICloudFlareDdnsService.cs" />
+    <Compile Include="Interfaces\ICloudFlareDdnsCommsService.cs" />
+    <Compile Include="Interfaces\IOutputService.cs" />
     <Compile Include="Models\CloudFlareDdnsCommsServiceResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

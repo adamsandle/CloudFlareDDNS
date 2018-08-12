@@ -69,9 +69,23 @@ namespace CloudFlareDdns.Service
             return result;
         }
 
-        public string GetIp()
+        public GetIpResponse GetIp()
         {
-            return IpResponse.Ip;
+            if (IpResponse != null)
+            {
+                return new GetIpResponse
+                {
+                    Success = true,
+                    IpAddress = IpResponse.Ip
+                };
+            }
+
+            return new GetIpResponse
+            {
+                Success = false,
+                ErrorMessage = "Failed to get IP Address"
+            };
+
         }
 
         public async Task<UpdateResponse> ForceUpdate(string[] hosts)
@@ -93,8 +107,8 @@ namespace CloudFlareDdns.Service
                 typeof(CloudFlareDdnsCommsService),
                 new Uri[]
                 {
-                    new Uri("http://localhost:8320"),
-                    new Uri("net.pipe://localhost")
+                    new Uri("http://0.0.0.0:8320"),
+                    new Uri("net.pipe://0.0.0.0")
                 });
             _host.AddServiceEndpoint(typeof(ICloudFlareDdnsCommsService),
                 new BasicHttpBinding(),
