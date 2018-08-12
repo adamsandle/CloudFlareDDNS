@@ -1,7 +1,7 @@
 ﻿using CloudFlareDdns.SharedLogic.Interfaces;
 using CloudFlareDdns.SharedLogic.Models;
 
-namespace CloudFlareDdns.Service
+namespace CloudFlareDdns.Service.Services
 {
     public class CloudFlareDdnsCommsService : ICloudFlareDdnsCommsService
     {

@@ -1,12 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.ServiceModel;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using System.Timers;
+using CloudFlareDdns.Service.Interfaces;
 using CloudFlareDdns.Service.Models;
 using CloudFlareDdns.Service.Models.Response;
-using CloudFlareDdns.Service.Utils;
 using CloudFlareDdns.SharedLogic.Interfaces;
 using CloudFlareDdns.SharedLogic.Models;
 
@@ -19,22 +18,32 @@ namespace CloudFlareDdns.Service
         public static IpResponse IpResponse;
         private bool _isUpdating;
         public static UserConfig UserConfig;
-        public CloudFlareDdnsService()
+        private readonly IOutputService _outputService;
+        private readonly IHttpService _httpService;
+        private readonly IUserConfigService _configService;
+        private readonly CloudFlareApi _cloudFlareApi;
+        public CloudFlareDdnsService(IOutputService outputService, IHttpService httpService, IUserConfigService configService, IServiceHostFactory serviceHostFactory)
         {
+            _outputService = outputService;
+            _httpService = httpService;
+            _configService = configService;
+            _host = serviceHostFactory.CreateServiceHost();
+            _cloudFlareApi = new CloudFlareApi(_outputService, _httpService);
+
             InitializeComponent();
             _isUpdating = false;
         }
 
         protected override void OnStart(string[] args)
         {
-            Logger.WriteLog("CloudFlare DDNS service started");
-            Directory.CreateDirectory(Config.Folder);
-            UserConfig = Config.GetUserConfig();
+            _outputService.WriteLine("CloudFlare DDNS service started");
+            _configService.CreateFolder();
+            UserConfig = _configService.GetUserConfig();
             if (UserConfig == null)
             {
                 Environment.Exit(0);
             }
-            SetUpServer();
+            _host.Open();
             _eventTimer = new Timer {Interval = 10000};
             _eventTimer.Elapsed += EventTimerTick;
             _eventTimer.Enabled = true;
@@ -51,11 +60,11 @@ namespace CloudFlareDdns.Service
         private async Task<UpdateResponse> UpdateDns(string[] hosts, bool forceUpdate = false)
         {
             _isUpdating = true;
-            var currentIp = await Http.GetPublicIp();
+            var currentIp = await _httpService.GetPublicIp();
             var updateDns = false;
             if (currentIp != null && IpResponse?.Ip != currentIp.Ip)
             {
-                Logger.WriteLog("Ip updated:" + currentIp.Ip);
+                _outputService.WriteLine("Ip updated:" + currentIp.Ip);
                 updateDns = true;
             }
             IpResponse = currentIp;
@@ -63,7 +72,7 @@ namespace CloudFlareDdns.Service
             UpdateResponse result = null;
             if (updateDns || forceUpdate)
             {
-                result = await CloudFlareApi.UpdateDns(hosts);
+                result = await _cloudFlareApi.UpdateDns(hosts);
             }
             _isUpdating = false;
             return result;
@@ -98,27 +107,7 @@ namespace CloudFlareDdns.Service
         {
             _host?.Close();
             _eventTimer.Enabled = false;
-            Logger.WriteLog("Test service stopped");
-        }
-
-        private static void SetUpServer()
-        {
-            _host = new ServiceHost(
-                typeof(CloudFlareDdnsCommsService),
-                new Uri[]
-                {
-                    new Uri("http://0.0.0.0:8320"),
-                    new Uri("net.pipe://0.0.0.0")
-                });
-            _host.AddServiceEndpoint(typeof(ICloudFlareDdnsCommsService),
-                new BasicHttpBinding(),
-                "Reverse");
-
-            _host.AddServiceEndpoint(typeof(ICloudFlareDdnsCommsService),
-                new NetNamedPipeBinding(),
-                "PipeReverse");
-
-            _host.Open();
+            _outputService.WriteLine("CloudFlareDDNS service stopped");
         }
     }
 }

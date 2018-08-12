@@ -54,9 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CloudFlareApi.cs" />
-    <Compile Include="CloudFlareDdnsCommsService.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="Utils\Http.cs" />
+    <Compile Include="Interfaces\IServiceHostFactory.cs" />
+    <Compile Include="Services\ServiceHostFactory.cs" />
+    <Compile Include="Services\CloudFlareDdnsCommsService.cs" />
+    <Compile Include="Interfaces\IUserConfigService.cs" />
+    <Compile Include="Services\UserConfigService.cs" />
+    <Compile Include="Interfaces\IHttpService.cs" />
+    <Compile Include="Services\HttpService.cs" />
     <Compile Include="Models\Requests\BaseRequest.cs" />
     <Compile Include="Models\Response\CloudFlareBaseResponse.cs" />
     <Compile Include="Models\Response\CloudFlareDnsRecordResponse.cs" />
@@ -65,7 +69,7 @@
     <Compile Include="Models\Requests\CloudFlareUpdateDnsRecordRequest.cs" />
     <Compile Include="Models\Response\CloudFlareZonesResponse.cs" />
     <Compile Include="Models\Response\IpResponse.cs" />
-    <Compile Include="Utils\Logger.cs" />
+    <Compile Include="Services\FileOutputService.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -96,5 +100,6 @@
       <Name>CloudFlareDdns.SharedLogic</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
