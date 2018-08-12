@@ -1,4 +1,7 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.IO;
+using System.ServiceProcess;
+using CloudFlareDdns.Service.Services;
 
 namespace CloudFlareDdns.Service
 {
@@ -11,10 +14,11 @@ namespace CloudFlareDdns.Service
         /// </summary>
         static void Main()
         {
+            var fileOutputService = new FileOutputService(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudFlareDDNS"));
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                _service = new CloudFlareDdnsService()
+                _service = new CloudFlareDdnsService(fileOutputService, new HttpService(fileOutputService), new UserConfigService(fileOutputService, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudFlareDDNS")), new ServiceHostFactory())
             };
             ServiceBase.Run(ServicesToRun);
         }
