@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
-using System.Threading.Tasks;
 using CloudFlareDdns.SharedLogic.Models;
 
 namespace CloudFlareDdns.SharedLogic.Interfaces
@@ -9,7 +8,7 @@ namespace CloudFlareDdns.SharedLogic.Interfaces
     public interface ICloudFlareDdnsCommsService
     {
         [OperationContract]
-        string GetIp();
+        GetIpResponse GetIp();
 
         [OperationContract]
         UpdateResponse ForceUpdate(string[] hosts);
