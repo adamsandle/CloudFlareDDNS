@@ -15,14 +15,16 @@ namespace CloudFlareDdns.Service
     {
         private static ServiceHost _host;
         private Timer _eventTimer;
-        public static IpResponse IpResponse;
+        private IpResponse _ipResponse;
         private bool _isUpdating;
-        public static UserConfig UserConfig;
+        private UserConfig _userConfig;
         private readonly IOutputService _outputService;
         private readonly IHttpService _httpService;
         private readonly IUserConfigService _configService;
         private readonly CloudFlareApi _cloudFlareApi;
-        public CloudFlareDdnsService(IOutputService outputService, IHttpService httpService, IUserConfigService configService, IServiceHostFactory serviceHostFactory)
+
+        public CloudFlareDdnsService(IOutputService outputService, IHttpService httpService,
+            IUserConfigService configService, IServiceHostFactory serviceHostFactory)
         {
             _outputService = outputService;
             _httpService = httpService;
@@ -38,11 +40,8 @@ namespace CloudFlareDdns.Service
         {
             _outputService.WriteLine("CloudFlare DDNS service started");
             _configService.CreateFolder();
-            UserConfig = _configService.GetUserConfig();
-            if (UserConfig == null)
-            {
-                Environment.Exit(0);
-            }
+            _userConfig = _configService.GetUserConfig();
+            _httpService.CloudFlareCredentialsUpdated(_userConfig.Email, _userConfig.ApiKey);
             _host.Open();
             _eventTimer = new Timer {Interval = 10000};
             _eventTimer.Elapsed += EventTimerTick;
@@ -51,9 +50,10 @@ namespace CloudFlareDdns.Service
 
         private async void EventTimerTick(object sender, ElapsedEventArgs e)
         {
-            if ((IpResponse == null && !_isUpdating || IpResponse != null && (DateTime.UtcNow - IpResponse.Updated).Minutes > 4) && !_isUpdating)
+            if ((_ipResponse == null && !_isUpdating ||
+                 _ipResponse != null && (DateTime.UtcNow - _ipResponse.Updated).Minutes > 4) && !_isUpdating)
             {
-                await UpdateDns(UserConfig.Hosts);
+                await UpdateDns(_userConfig.Hosts);
             }
         }
 
@@ -62,30 +62,32 @@ namespace CloudFlareDdns.Service
             _isUpdating = true;
             var currentIp = await _httpService.GetPublicIp();
             var updateDns = false;
-            if (currentIp != null && IpResponse?.Ip != currentIp.Ip)
+            if (currentIp != null && _ipResponse?.Ip != currentIp.Ip)
             {
                 _outputService.WriteLine("Ip updated:" + currentIp.Ip);
                 updateDns = true;
             }
-            IpResponse = currentIp;
+
+            _ipResponse = currentIp;
 
             UpdateResponse result = null;
             if (updateDns || forceUpdate)
             {
-                result = await _cloudFlareApi.UpdateDns(hosts);
+                result = await _cloudFlareApi.UpdateDns(hosts, _ipResponse?.Ip);
             }
+
             _isUpdating = false;
             return result;
         }
 
         public GetIpResponse GetIp()
         {
-            if (IpResponse != null)
+            if (_ipResponse != null)
             {
                 return new GetIpResponse
                 {
                     Success = true,
-                    IpAddress = IpResponse.Ip
+                    IpAddress = _ipResponse.Ip
                 };
             }
 
@@ -99,8 +101,14 @@ namespace CloudFlareDdns.Service
 
         public async Task<UpdateResponse> ForceUpdate(string[] hosts)
         {
-            var result = await UpdateDns(hosts.Length > 0 ? hosts : UserConfig.Hosts, true);
+            var result = await UpdateDns(hosts.Length > 0 ? hosts : _userConfig.Hosts, true);
             return result;
+        }
+
+        public CloudFlareDdnsCommsServiceBaseResponse ReloadConfig()
+        {
+            _userConfig = _configService.GetUserConfig();
+            return new CloudFlareDdnsCommsServiceBaseResponse();
         }
 
         protected override void OnStop()
