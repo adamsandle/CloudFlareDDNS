@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using CloudFlareDdns.Service.Interfaces;
+using CloudFlareDdns.Service.Models;
 using CloudFlareDdns.Service.Models.Requests;
 using CloudFlareDdns.Service.Models.Response;
 using CloudFlareDdns.SharedLogic.Interfaces;
@@ -15,12 +16,21 @@ namespace CloudFlareDdns.Service.Services
     {
         private readonly IOutputService _outputService;
         private readonly HttpClient _httpClient = new HttpClient();
+        private string _cloudFlareEmail;
+        private string _cloudFlareApiKey;
         private const string CloudFlareBaseUrl = "https://api.cloudflare.com/client/v4/";
         private const string IpUrl = "https://api.ipify.org?format=json";
 
         public HttpService(IOutputService outputService)
         {
             _outputService = outputService;
+            
+        }
+
+        public void CloudFlareCredentialsUpdated(string email, string key)
+        {
+            _cloudFlareEmail = email;
+            _cloudFlareApiKey = key;
         }
 
         public async Task<IpResponse> GetPublicIp()
@@ -68,8 +78,8 @@ namespace CloudFlareDdns.Service.Services
 
             if (cloudFlare)
             {
-                request.Headers.Add("X-Auth-Key", CloudFlareDdnsService.UserConfig.ApiKey);
-                request.Headers.Add("X-Auth-Email", CloudFlareDdnsService.UserConfig.Email);
+                request.Headers.Add("X-Auth-Key", _cloudFlareApiKey);
+                request.Headers.Add("X-Auth-Email", _cloudFlareEmail);
             }
 
             if (body != null)

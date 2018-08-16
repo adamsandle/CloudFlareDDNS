@@ -6,6 +6,7 @@ namespace CloudFlareDdns.Service.Interfaces
 {
     public interface IHttpService
     {
+        void CloudFlareCredentialsUpdated(string email, string key);
         Task<IpResponse> GetPublicIp();
         Task<CloudFlareZonesResponse> GetZones();
         Task<CloudFlareDnsRecordsResponse> GetRecords(string zoneId);

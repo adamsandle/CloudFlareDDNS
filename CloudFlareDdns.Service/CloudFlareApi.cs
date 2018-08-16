@@ -19,7 +19,7 @@ namespace CloudFlareDdns.Service
             _outputService = outputService;
             _httpService = httpService;
         }
-        public async Task<UpdateResponse> UpdateDns(string[] hosts)
+        public async Task<UpdateResponse> UpdateDns(string[] hosts, string ipAddress)
         {
             List<string> hostsToUpdate = hosts.ToList();
             List<string> hostsUpdated = new List<string>();
@@ -50,7 +50,7 @@ namespace CloudFlareDdns.Service
                         type = recordDetails.Result.Type,
                         proxied = recordDetails.Result.Proxied,
                         ttl = recordDetails.Result.Ttl,
-                        content = CloudFlareDdnsService.IpResponse.Ip
+                        content = ipAddress
                     };
                     var updateResult = await _httpService.UpdateRecord(record.Zone_Id, record.Id, request);
                     if (updateResult.Success)
